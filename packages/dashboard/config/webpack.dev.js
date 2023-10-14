@@ -1,4 +1,5 @@
 const { merge } = require("webpack-merge"); // merge will merge two config files.. i.e in our case the common weback file and dev webpack file
+const HtmlWebpackPlugin = require("html-webpack-plugin"); // take some html file inside out project and inject script tags to with out js code
 const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPlugin");
 const commonConfig = require("./webpack.common");
 const packageJson = require("../package.json");
@@ -6,26 +7,31 @@ const packageJson = require("../package.json");
 const devConfig = {
   mode: "development",
   output: {
-    publicPath: "http://localhost:8080/",
+    publicPath: "http://localhost:8083/",
   },
   devServer: {
-    port: 8080,
+    port: 8083,
     historyApiFallback: {
       index: "/index.html",
     },
+    headers: {
+      // we'll be loading some font files
+      "Access-Control-Allow-Origin": "*",
+    },
   },
   plugins: [
+    // this plugin will make connection between container and remote application
     new ModuleFederationPlugin({
-      name: "container",
-      remotes: {
-        // the value marketing name has to match the name property that we set in remote mfe ModuleFederationPlugin name property
-        // the key marketing will be used when we want to load the mfe in out container app
-        marketing: "marketing@http://localhost:8081/remoteEntry.js",
-        auth: "auth@http://localhost:8082/remoteEntry.js",
-        dashboard: "dashboard@http://localhost:8083/remoteEntry.js",
+      name: "dashboard",
+      filename: "remoteEntry.js",
+      exposes: {
+        "./DashboardApp": "./src/bootstrap",
       },
       // bellow code will help us share prod dependies between mfe and container as we dont want to load multiple same libraries
       shared: packageJson.dependencies,
+    }),
+    new HtmlWebpackPlugin({
+      template: "./public/index.html",
     }),
   ],
 };
