@@ -1,8 +1,7 @@
-const { merge } = require("webpack-merge");
+const { merge } = require("webpack-merge"); // merge will merge two config files.. i.e in our case the common weback file and dev webpack file
 const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPlugin");
 const commonConfig = require("./webpack.common");
 const packageJson = require("../package.json");
-const domain = process.env.PRODUCTION_DOMAIN;
 
 const prodConfig = {
   mode: "production",
@@ -12,14 +11,14 @@ const prodConfig = {
     // public path option will be used whenever some part of webpack trying to refer to some part of file built by webpack. previously html webpack plugin
     // was trying to refer directly file name i.e(cloudFrontUrl/filename) but in aws s3 we have folder structure /container/latest/ for our mfe so public
     // path will prepend while creating file name and we'll get correct public path
-    publicPath: "/container/latest/",
+    publicPath: "/auth/latest/",
   },
   plugins: [
     new ModuleFederationPlugin({
-      name: "container",
-      remotes: {
-        marketing: `marketing@${domain}/marketing/latest/remoteEntry.js`,
-        auth: `auth@${domain}/auth/latest/remoteEntry.js`,
+      name: "auth",
+      filename: "remoteEntry.js",
+      exposes: {
+        "./AuthApp": "./src/bootstrap",
       },
       shared: packageJson.dependencies,
     }),

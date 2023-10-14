@@ -1,11 +1,12 @@
-import React from "react";
-import MarketingApp from "./components/MarketingApp";
+import React, { useState } from "react";
 import Header from "./components/Header";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, Route, Switch } from "react-router-dom";
 import {
   StylesProvider,
   createGenerateClassName,
 } from "@material-ui/core/styles";
+import MarketingApp from "./components/MarketingApp";
+import AuthApp from "./components/AuthApp";
 
 //  we are using createGenerateClassName as we are using same styling library(material-ui) for container and
 // marketing app so when in production we build the css for the application due to the use of same libraries,
@@ -18,12 +19,24 @@ const generateClassName = createGenerateClassName({
 });
 
 export default () => {
+  const [isSignedIn, setIsSignedIn] = useState(false);
   return (
+    // browser router is behind the scenes using browser history we want to use browser history only in case of container app
     <BrowserRouter>
       <StylesProvider generateClassName={generateClassName}>
         <div>
-          <Header />
-          <MarketingApp />
+          <Header
+            onSignOut={() => setIsSignedIn(false)}
+            isSignedIn={isSignedIn}
+          />
+          <Switch>
+            <Route path="/auth">
+              <AuthApp onSignIn={() => setIsSignedIn(true)} />
+            </Route>
+            <Route path="/">
+              <MarketingApp onSignIn={() => setIsSignedIn(true)} />
+            </Route>
+          </Switch>
         </div>
       </StylesProvider>
     </BrowserRouter>

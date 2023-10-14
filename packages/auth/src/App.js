@@ -5,8 +5,8 @@ import {
   createGenerateClassName,
 } from "@material-ui/core/styles";
 
-import Landing from "./components/Landing";
-import Pricing from "./components/Pricing";
+import Signin from "./components/Signin";
+import Signup from "./components/Signup";
 
 //  we are using createGenerateClassName as we are using same styling library(material-ui) for container and
 // marketing app so when in production we build the css for the application due to the use of same libraries,
@@ -15,10 +15,10 @@ import Pricing from "./components/Pricing";
 // for both the application could collide and result in conflicting css
 // so we are using createGenerateClassName to prevent those classname collision
 const generateClassName = createGenerateClassName({
-  productionPrefix: "ma", // marketing
+  productionPrefix: "au", // auth
 });
 
-export default ({ history }) => {
+export default ({ history, onSignIn }) => {
   return (
     <div>
       <StylesProvider generateClassName={generateClassName}>
@@ -30,8 +30,12 @@ export default ({ history }) => {
           // remote apps would do to browser url
           <Router history={history}>
             <Switch>
-              <Route exact path="/pricing" component={Pricing} />
-              <Route exact path="/" component={Landing} />
+              <Route path="/auth/signin/">
+                <Signin onSignIn={onSignIn} />
+              </Route>
+              <Route path="/auth/signup/">
+                <Signup onSignIn={onSignIn} />
+              </Route>
             </Switch>
           </Router>
         }
